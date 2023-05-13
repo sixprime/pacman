@@ -1,0 +1,21 @@
+ninja_required_version = 1.11
+
+root = .
+builddir = build
+cxx = clang++
+cflags = -std=c++17 -Wall -Wextra -Wpedantic
+ldflags = -L$builddir
+
+rule cxx
+  command = $cxx $cflags -c $in -o $out
+
+rule link
+  command = $cxx $ldflags $in -o $out
+
+build $builddir/convoy.o: cxx $root/src/convoy.cpp
+
+build convoy: link $builddir/convoy.o
+
+default convoy
+
+build all: phony convoy
