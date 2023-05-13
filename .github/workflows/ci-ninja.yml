@@ -1,0 +1,42 @@
+name: CI Ninja
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+        # TODO: support multiple platforms: [windows-latest, ubuntu-latest, macos-latest]
+        # TODO: support multiple compilers: [clang++, g++, msvc]
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Ninja
+      run: |
+            case ${{ runner.os }} in
+            Windows*)
+              choco install ninja
+              ;;
+            Linux*)
+              sudo apt update
+              sudo apt-get install ninja-build
+              ;;
+            macOS*)
+              brew install ninja
+              ;;
+            esac
+      shell: bash
+
+    - name: Build Convoy
+      run: ninja
