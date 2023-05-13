@@ -29,4 +29,4 @@
 convoy
 
 # Build files
-.ninja_log
+/build*/
