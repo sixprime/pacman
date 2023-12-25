@@ -3,7 +3,7 @@ ninja_required_version = 1.10
 root = .
 builddir = build
 cxx = clang++
-cflags = -std=c++17 -Wall -Wextra -Wpedantic
+cflags = -std=c++17 -Wall -Wextra -Wpedantic -Isrc/
 ldflags = -L$builddir
 
 rule cxx
@@ -12,10 +12,12 @@ rule cxx
 rule link
   command = $cxx $ldflags $in -o $out
 
-build $builddir/convoy.o: cxx $root/src/convoy.cpp
+build $builddir/main.o: cxx $root/src/main.cpp
+build $builddir/commands/new.o: cxx $root/src/commands/new.cpp
 
-build convoy: link $builddir/convoy.o
+build convoy.exe: link $builddir/main.o $
+    $builddir/commands/new.o
 
-default convoy
+default convoy.exe
 
-build all: phony convoy
+build all: phony convoy.exe

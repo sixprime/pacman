@@ -30,3 +30,6 @@ convoy
 
 # Build files
 /build*/
+
+# Code editors
+.vscode/
