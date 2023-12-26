@@ -10,7 +10,11 @@ int main(int argc, char* argv[])
     {
         if (arguments[0] == "new")
         {
-            commands::New::execute(arguments[1]);
+            commands::New::Execute(arguments[1]);
+        }
+        else if (arguments[0] == "build")
+        {
+            commands::Build::Execute(arguments[1]);
         }
     }
 

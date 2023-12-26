@@ -14,9 +14,11 @@ rule link
 
 build $builddir/main.o: cxx $root/src/main.cpp
 build $builddir/commands/new.o: cxx $root/src/commands/new.cpp
+build $builddir/commands/build.o: cxx $root/src/commands/build.cpp
 
 build convoy.exe: link $builddir/main.o $
-    $builddir/commands/new.o
+    $builddir/commands/new.o $
+    $builddir/commands/build.o
 
 default convoy.exe
 

@@ -5,7 +5,7 @@
 namespace commands
 {
 
-class New
+class Build
 {
 public:
     static void Execute(std::filesystem::path path);
