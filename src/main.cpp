@@ -16,6 +16,10 @@ int main(int argc, char* argv[])
         {
             commands::Build::Execute(arguments[1]);
         }
+        else if (arguments[0] == "run")
+        {
+            commands::Run::Execute(arguments[1]);
+        }
     }
 
     return 0;
