@@ -70,8 +70,9 @@ static std::vector<std::filesystem::path> GetFilesToCompile(std::filesystem::pat
 static std::string MakeClangCompilationCommandLine(std::filesystem::path path, const Manifest& manifest, const std::vector<std::filesystem::path>& srcFiles)
 {
     // Ex: "clang++ -std=c++17 -Wall -Wextra -Wpedantic -Isrc/ src/main.cpp src/commands/new.cpp src/commands/build.cpp -o convoy.exe"
-    std::filesystem::path srcIncludeDir = path / "src";
-    std::string command = "clang++ -std=c++17 -Wall -Wextra -Wpedantic -I" + srcIncludeDir.string();
+    std::filesystem::path publicIncludeDir = path / "include";
+    std::filesystem::path privateIncludeDir = path / "src";
+    std::string command = "clang++ -std=c++17 -Wall -Wextra -Wpedantic -I" + publicIncludeDir.string() + " -I" + privateIncludeDir.string();
 
     for (const auto& srcFile : srcFiles)
     {
