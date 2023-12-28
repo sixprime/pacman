@@ -1,4 +1,4 @@
-#include "commands/build.h"
+#include "convoy/commands/build.h"
 
 #include <array>
 #include <chrono>
@@ -126,14 +126,16 @@ void Build::Execute(std::filesystem::path path)
         std::cerr << result << std::endl;
     }
 
-    // Move binary to dist folder.
-    const auto binDirectory = std::filesystem::current_path() / path / "bin";
-    std::filesystem::create_directories(binDirectory);
-    const std::string binaryName = manifest.packageName + ".exe";
-    std::filesystem::rename(binaryName, path / "bin" / binaryName);
+    // Move binary to target folder.
+    const std::filesystem::path target = "bin";
+    const std::filesystem::path profile = "debug";
+    const std::filesystem::path outputDirectory = std::filesystem::current_path() / path / target / profile;
+    std::filesystem::create_directories(outputDirectory);
+    const std::string binaryNameWindows = manifest.packageName + ".exe";
+    std::filesystem::rename(binaryNameWindows, path / target / profile / binaryNameWindows);
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto durationSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-    std::cout << "Finished dev [unoptimized + debuginfo] target(s) in " << durationSeconds.count() / 1000.0 << " secs" << std::endl;
+    std::cout << "Finished " << target.string() << " [" << profile.string() << "] target in " << durationSeconds.count() / 1000.0 << " secs" << std::endl;
 }

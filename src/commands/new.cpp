@@ -1,4 +1,4 @@
-#include "commands/new.h"
+#include "convoy/commands/new.h"
 
 #include <fstream>
 

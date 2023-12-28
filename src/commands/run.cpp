@@ -1,6 +1,6 @@
-#include "commands/run.h"
+#include "convoy/commands/run.h"
 
-#include "commands/build.h"
+#include "convoy/commands/build.h"
 
 #include <array>
 #include <string>
@@ -30,11 +30,12 @@ static std::string ExecuteShellCommand(const std::string& command)
 
 void Run::Execute(std::filesystem::path path)
 {
-    const std::string binaryOutputName = path.stem().string() + ".exe";
-    const std::filesystem::path binaryOutputFilepath = path / "bin" / binaryOutputName;
-
     Build::Execute(path);
 
+    const std::filesystem::path target = "bin";
+    const std::filesystem::path profile = "debug";
+    const std::string binaryNameWindows = path.stem().string() + ".exe";
+    const std::filesystem::path binaryOutputFilepath = path / target / profile / binaryNameWindows;
     const auto result = ExecuteShellCommand("\"\"" + binaryOutputFilepath.string() + "\"\"");
     std::cout << result;
 }
