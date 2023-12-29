@@ -14,17 +14,17 @@ rule cxx
 rule link
   command = $cxx $ldflags $in -o $out
 
-build $builddir/commands\build.o: cxx $root/src/commands\build.cpp
-build $builddir/commands\generate.o: cxx $root/src/commands\generate.cpp
-build $builddir/commands\new.o: cxx $root/src/commands\new.cpp
-build $builddir/commands\run.o: cxx $root/src/commands\run.cpp
+build $builddir/commands/build.o: cxx $root/src/commands/build.cpp
+build $builddir/commands/generate.o: cxx $root/src/commands/generate.cpp
+build $builddir/commands/new.o: cxx $root/src/commands/new.cpp
+build $builddir/commands/run.o: cxx $root/src/commands/run.cpp
 build $builddir/main.o: cxx $root/src/main.cpp
 
 build convoy.exe: link $
-  $builddir/commands\build.o $
-  $builddir/commands\generate.o $
-  $builddir/commands\new.o $
-  $builddir/commands\run.o $
+  $builddir/commands/build.o $
+  $builddir/commands/generate.o $
+  $builddir/commands/new.o $
+  $builddir/commands/run.o $
   $builddir/main.o $
 
 default convoy.exe

@@ -57,7 +57,13 @@ static void GenerateForNinja(std::filesystem::path path)
         std::vector<std::filesystem::path> srcFiles = GetFilesToCompile(path / "src");
         for (const std::filesystem::path& srcFile: srcFiles)
         {
-            file << "build $builddir/" << std::filesystem::relative(srcFile, path / "src").replace_extension(".o").string() << ": cxx $root/src/" << std::filesystem::relative(srcFile, path / "src").string() << "\n";
+            std::string srcFileRelativePathString = std::filesystem::relative(srcFile, path / "src").string();
+            std::replace(srcFileRelativePathString.begin(), srcFileRelativePathString.end(), '\\', '/'); // I wish I didn't have to do that...
+
+            std::string objFileRelativePathString = std::filesystem::relative(srcFile, path / "src").replace_extension(".o").string();
+            std::replace(objFileRelativePathString.begin(), objFileRelativePathString.end(), '\\', '/');
+
+            file << "build $builddir/" << objFileRelativePathString << ": cxx $root/src/" << srcFileRelativePathString << "\n";
         }
         file << "\n";
 
@@ -68,7 +74,10 @@ static void GenerateForNinja(std::filesystem::path path)
         file << ": link $\n";
         for (const std::filesystem::path& srcFile: srcFiles)
         {
-            file << "  $builddir/" << std::filesystem::relative(srcFile, path / "src").replace_extension(".o").string() << " $\n";
+            std::string objFileRelativePathString = std::filesystem::relative(srcFile, path / "src").replace_extension(".o").string();
+            std::replace(objFileRelativePathString.begin(), objFileRelativePathString.end(), '\\', '/');
+
+            file << "  $builddir/" << objFileRelativePathString << " $\n";
         }
         file << "\n";
 
