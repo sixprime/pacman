@@ -34,8 +34,18 @@ void Run::Execute(std::filesystem::path path)
 
     const std::filesystem::path target = "bin";
     const std::filesystem::path profile = "debug";
-    const std::string binaryNameWindows = path.stem().string() + ".exe";
-    const std::filesystem::path binaryOutputFilepath = path / target / profile / binaryNameWindows;
-    const auto result = ExecuteShellCommand("\"\"" + binaryOutputFilepath.string() + "\"\"");
+
+    if (path == ".")
+    {
+        path = std::filesystem::current_path();
+    }
+
+    std::string binaryTarget = path.stem().string();
+#ifdef _WIN32
+    binaryTarget += ".exe";
+#endif // _WIN32
+
+    const std::filesystem::path binaryTargetFilepath = path / target / profile / binaryTarget;
+    const auto result = ExecuteShellCommand("\"\"" + binaryTargetFilepath.string() + "\"\"");
     std::cout << result;
 }
