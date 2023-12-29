@@ -27,8 +27,7 @@
 *.out
 *.app
 
-# Build files
-/build*/
-
-# Code editors
+# Folders to ignore
+/bin/
+/build/
 .vscode/

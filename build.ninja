@@ -20,13 +20,13 @@ build $builddir/commands/new.o: cxx $root/src/commands/new.cpp
 build $builddir/commands/run.o: cxx $root/src/commands/run.cpp
 build $builddir/main.o: cxx $root/src/main.cpp
 
-build convoy.exe: link $
+build bin/debug/convoy.exe: link $
   $builddir/commands/build.o $
   $builddir/commands/generate.o $
   $builddir/commands/new.o $
   $builddir/commands/run.o $
   $builddir/main.o $
 
-default convoy.exe
+default bin/debug/convoy.exe
 
-build all: phony convoy.exe
+build all: phony bin/debug/convoy.exe

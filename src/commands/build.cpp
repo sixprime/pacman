@@ -1,5 +1,7 @@
 #include "convoy/commands/build.h"
 
+#include "convoy/commands/generate.h"
+
 #include <array>
 #include <chrono>
 #include <cstdio>
@@ -51,6 +53,7 @@ static Manifest GetManifestInfo(std::filesystem::path path)
     return manifest;
 }
 
+#if 0
 static std::vector<std::filesystem::path> GetFilesToCompile(std::filesystem::path path)
 {
     std::vector<std::filesystem::path> files;
@@ -87,6 +90,7 @@ static std::string MakeClangCompilationCommandLine(std::filesystem::path path, c
 
     return command;
 }
+#endif
 
 static std::string ExecuteShellCommand(const std::string& command)
 {
@@ -117,31 +121,43 @@ void Build::Execute(std::filesystem::path path)
 
     // Read package name and version from manifest file.
     Manifest manifest = GetManifestInfo(path);
-    if (manifest.packageName.empty() || manifest.packageVersion.empty())
+
+    if (manifest.packageName.empty())
     {
-        std::cerr << "Failed to find manifest package name or version..." << std::endl;
+        std::cerr << "convoy: failed to find manifest package name!" << std::endl;
         return;
     }
 
-    std::cout << "Compiling " << manifest.packageName << " v" << manifest.packageVersion << std::endl;
+    if (manifest.packageVersion.empty())
+    {
+        std::cerr << "convoy: failed to find manifest package version!" << std::endl;
+        return;
+    }
 
     // Compile.
+    std::cout << "convoy: compiling " << manifest.packageName << " v" << manifest.packageVersion << std::endl;
+
     const std::filesystem::path target = "bin";
     const std::filesystem::path profile = "debug";
+    Generate::Execute("ninja", path, target, profile);
+
+#if 0
     const std::filesystem::path outputDirectory = std::filesystem::current_path() / path / target / profile;
     std::filesystem::create_directories(outputDirectory);
 
     std::vector<std::filesystem::path> srcFiles = GetFilesToCompile(path / "src");
     const std::string compilationCommand = MakeClangCompilationCommandLine(path, manifest, srcFiles, target, profile);
+#endif
+
+    const std::string compilationCommand = "ninja -C " + path.string();
     const std::string result = ExecuteShellCommand(compilationCommand);
     if (!result.empty())
     {
-        std::cerr << result << std::endl;
-        return;
+        std::cout << result;
     }
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto durationSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-    std::cout << "Finished " << target.string() << " [" << profile.string() << "] target in " << durationSeconds.count() / 1000.0 << " secs" << std::endl;
+    std::cout << "convoy: finished " << target.string() << " [" << profile.string() << "] target in " << durationSeconds.count() / 1000.0 << " secs" << std::endl;
 }

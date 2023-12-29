@@ -11,12 +11,6 @@
 
 using namespace commands;
 
-struct Manifest
-{
-    std::string packageName;
-    std::string packageVersion;
-};
-
 static std::vector<std::filesystem::path> GetFilesToCompile(std::filesystem::path path)
 {
     std::vector<std::filesystem::path> files;
@@ -33,8 +27,16 @@ static std::vector<std::filesystem::path> GetFilesToCompile(std::filesystem::pat
     return files;
 }
 
-static void GenerateForNinja(std::filesystem::path path)
+static void GenerateNinjaBuildFiles(std::filesystem::path path, std::filesystem::path target, std::filesystem::path profile)
 {
+    if (path == ".")
+    {
+        path = std::filesystem::current_path();
+    }
+
+    std::string outputPathString = (target / profile / path.stem()).string();
+    std::replace(outputPathString.begin(), outputPathString.end(), '\\', '/');
+
     const auto buildFile = path / "build.ninja";
     std::ofstream file { buildFile };
     if (file.is_open())
@@ -59,7 +61,7 @@ static void GenerateForNinja(std::filesystem::path path)
         for (const std::filesystem::path& srcFile: srcFiles)
         {
             std::string srcFileRelativePathString = std::filesystem::relative(srcFile, path / "src").string();
-            std::replace(srcFileRelativePathString.begin(), srcFileRelativePathString.end(), '\\', '/'); // I wish I didn't have to do that...
+            std::replace(srcFileRelativePathString.begin(), srcFileRelativePathString.end(), '\\', '/');
 
             std::string objFileRelativePathString = std::filesystem::relative(srcFile, path / "src").replace_extension(".o").string();
             std::replace(objFileRelativePathString.begin(), objFileRelativePathString.end(), '\\', '/');
@@ -68,7 +70,8 @@ static void GenerateForNinja(std::filesystem::path path)
         }
         file << "\n";
 
-        file << "build " << path.stem().string();
+
+        file << "build " << outputPathString;
 #ifdef _WIN32
         file << ".exe";
 #endif // _WIN32
@@ -82,7 +85,7 @@ static void GenerateForNinja(std::filesystem::path path)
         }
         file << "\n";
 
-        file << "default " << path.stem().string();
+        file << "default " << outputPathString;
 #ifdef _WIN32
         file << ".exe\n";
 #else // !_WIN32
@@ -90,7 +93,7 @@ static void GenerateForNinja(std::filesystem::path path)
 #endif // _WIN32
         file << "\n";
 
-        file << "build all: phony " << path.stem().string();
+        file << "build all: phony " << outputPathString;
 #ifdef _WIN32
         file << ".exe\n";
 #else // !_WIN32
@@ -101,20 +104,15 @@ static void GenerateForNinja(std::filesystem::path path)
     }
 }
 
-void Generate::Execute(std::string buildSystem, std::filesystem::path path)
+void Generate::Execute(std::string buildSystem, std::filesystem::path path, std::filesystem::path target /*= "bin"*/, std::filesystem::path profile /*= "debug"*/)
 {
-    if (path == ".")
-    {
-        path = std::filesystem::current_path();
-    }
-
     if (buildSystem == "ninja")
     {
-        GenerateForNinja(path);
+        GenerateNinjaBuildFiles(path, target, profile);
     }
     else
     {
-        std::cerr << "Build system generator for '" << buildSystem << "' not supported!" << std::endl;
+        std::cerr << "convoy: build system generator for '" << buildSystem << "' not supported!" << std::endl;
         return;
     }
 }
