@@ -1,5 +1,6 @@
 #include "convoy/commands/generate.h"
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <cstdio>
@@ -84,7 +85,7 @@ static void GenerateForNinja(std::filesystem::path path)
         file << "default " << path.stem().string();
 #ifdef _WIN32
         file << ".exe\n";
-#else
+#else // !_WIN32
         file << "\n";
 #endif // _WIN32
         file << "\n";
@@ -92,7 +93,7 @@ static void GenerateForNinja(std::filesystem::path path)
         file << "build all: phony " << path.stem().string();
 #ifdef _WIN32
         file << ".exe\n";
-#else
+#else // !_WIN32
         file << "\n";
 #endif // _WIN32
 

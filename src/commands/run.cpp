@@ -13,7 +13,11 @@ static std::string ExecuteShellCommand(const std::string& command)
 {
     std::array<char, 64> buffer;
     std::string result;
-    std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(command.c_str(), "r"), _pclose); // Windows version
+#ifdef _WIN32
+    std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(command.c_str(), "r"), _pclose);
+#else // !_WIN32
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
+#endif // _WIN32
 
     if (!pipe)
     {
