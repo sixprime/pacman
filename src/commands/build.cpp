@@ -67,9 +67,8 @@ static std::vector<std::filesystem::path> GetFilesToCompile(std::filesystem::pat
     return files;
 }
 
-static std::string MakeClangCompilationCommandLine(std::filesystem::path path, const Manifest& manifest, const std::vector<std::filesystem::path>& srcFiles)
+static std::string MakeClangCompilationCommandLine(std::filesystem::path path, const Manifest& manifest, const std::vector<std::filesystem::path>& srcFiles, std::filesystem::path target, std::filesystem::path profile)
 {
-    // Ex: "clang++ -std=c++17 -Wall -Wextra -Wpedantic -Isrc/ src/main.cpp src/commands/new.cpp src/commands/build.cpp -o convoy.exe"
     std::filesystem::path publicIncludeDir = path / "include";
     std::filesystem::path privateIncludeDir = path / "src";
     std::string command = "clang++ -std=c++17 -Wall -Wextra -Wpedantic -I" + publicIncludeDir.string() + " -I" + privateIncludeDir.string();
@@ -79,8 +78,12 @@ static std::string MakeClangCompilationCommandLine(std::filesystem::path path, c
         command += " " + srcFile.string() + " ";
     }
 
-    const auto packageBinaryOutput = manifest.packageName + ".exe";
-    command += " -o " + packageBinaryOutput;
+    std::filesystem::path output = path / target / profile / manifest.packageName;
+#ifdef _WIN32
+    output += ".exe";
+#endif // _WIN32
+
+    command += " -o " + output.string();
 
     return command;
 }
@@ -119,21 +122,19 @@ void Build::Execute(std::filesystem::path path)
     std::cout << "Compiling " << manifest.packageName << " v" << manifest.packageVersion << std::endl;
 
     // Compile.
-    std::vector<std::filesystem::path> srcFiles = GetFilesToCompile(path / "src");
-    const std::string compilationCommand = MakeClangCompilationCommandLine(path, manifest, srcFiles);
-    const std::string result = ExecuteShellCommand(compilationCommand);
-    if (!result.empty())
-    {
-        std::cerr << result << std::endl;
-    }
-
-    // Move binary to target folder.
     const std::filesystem::path target = "bin";
     const std::filesystem::path profile = "debug";
     const std::filesystem::path outputDirectory = std::filesystem::current_path() / path / target / profile;
     std::filesystem::create_directories(outputDirectory);
-    const std::string binaryNameWindows = manifest.packageName + ".exe";
-    std::filesystem::rename(binaryNameWindows, path / target / profile / binaryNameWindows);
+
+    std::vector<std::filesystem::path> srcFiles = GetFilesToCompile(path / "src");
+    const std::string compilationCommand = MakeClangCompilationCommandLine(path, manifest, srcFiles, target, profile);
+    const std::string result = ExecuteShellCommand(compilationCommand);
+    if (!result.empty())
+    {
+        std::cerr << result << std::endl;
+        return;
+    }
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto durationSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
