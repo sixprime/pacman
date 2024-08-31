@@ -1,4 +1,4 @@
-#include "convoy/commands.h"
+#include "pacman/commands.h"
 
 #include <iostream>
 #include <string>
@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
     std::vector<std::string> arguments(argv + 1, argv + argc);
     if (arguments.empty())
     {
-        std::cout << "convoy help:\n"
+        std::cout << "pacman help:\n"
             << "  new [options] path            Create new package 'path'\n"
             << "  build [options] path          Build package at 'path'\n"
             << "  run [options] [--args] path   Run package at 'path'\n"

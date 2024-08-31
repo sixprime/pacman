@@ -1,4 +1,4 @@
-#include "convoy/commands/new.h"
+#include "pacman/commands/new.h"
 
 #include <fstream>
 
@@ -6,7 +6,7 @@ using namespace commands;
 
 static void CreateDefaultManifest(std::filesystem::path path)
 {
-    const auto manifest = std::filesystem::current_path() / path / "convoy.toml";
+    const auto manifest = std::filesystem::current_path() / path / "pacman.toml";
     const auto directory = manifest.parent_path();
     std::filesystem::create_directories(directory);
 

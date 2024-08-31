@@ -38,5 +38,5 @@ jobs:
             esac
       shell: bash
 
-    - name: Build Convoy
+    - name: Build Pacman
       run: ninja

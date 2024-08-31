@@ -1,6 +1,6 @@
-#include "convoy/commands/build.h"
+#include "pacman/commands/build.h"
 
-#include "convoy/commands/generate.h"
+#include "pacman/commands/generate.h"
 
 #include <array>
 #include <chrono>
@@ -24,7 +24,7 @@ static Manifest GetManifestInfo(std::filesystem::path path)
 {
     Manifest manifest;
 
-    std::ifstream file { path / "convoy.toml" };
+    std::ifstream file { path / "pacman.toml" };
     if (file.is_open())
     {
         std::string line;
@@ -124,18 +124,18 @@ void Build::Execute(std::filesystem::path path)
 
     if (manifest.packageName.empty())
     {
-        std::cerr << "convoy: failed to find manifest package name!" << std::endl;
+        std::cerr << "pacman: failed to find manifest package name!" << std::endl;
         return;
     }
 
     if (manifest.packageVersion.empty())
     {
-        std::cerr << "convoy: failed to find manifest package version!" << std::endl;
+        std::cerr << "pacman: failed to find manifest package version!" << std::endl;
         return;
     }
 
     // Compile.
-    std::cout << "convoy: compiling " << manifest.packageName << " v" << manifest.packageVersion << std::endl;
+    std::cout << "pacman: compiling " << manifest.packageName << " v" << manifest.packageVersion << std::endl;
 
     const std::filesystem::path target = "bin";
     const std::filesystem::path profile = "debug";
@@ -159,5 +159,5 @@ void Build::Execute(std::filesystem::path path)
     auto stop = std::chrono::high_resolution_clock::now();
     auto durationSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-    std::cout << "convoy: finished " << target.string() << " [" << profile.string() << "] target in " << durationSeconds.count() / 1000.0 << " secs" << std::endl;
+    std::cout << "pacman: finished " << target.string() << " [" << profile.string() << "] target in " << durationSeconds.count() / 1000.0 << " secs" << std::endl;
 }
